@@ -31,6 +31,10 @@ nsp.on('connection', function(socket){
     });
 
 
+    //practice with rooms
+        socket.join('some room');
+        io.of('/my-namespace').to('some room').emit('some event', 'if you get this message you are in the room');
+
 });    
 
 
