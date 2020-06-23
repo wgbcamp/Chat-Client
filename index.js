@@ -13,21 +13,24 @@ app.get('/', (req, res) => {
 const nsp = io.of('/my-namespace');
 nsp.on('connection', function(socket){
 
+    //holds value of last socket that performed an action
+        const sessionID = socket.id;
+        const slimmedID = sessionID.slice(sessionID.indexOf("#") + 1, sessionID.length);
 
     //displays when a user has connected and relays to connected clients
-    console.log('a user connected');
-    io.of('/my-namespace').emit('user connected', 'A new user has joined the chat.');
+    console.log('User ' + slimmedID + ' connected.');
+    io.of('/my-namespace').emit('user connected', 'User ' + slimmedID + ' has joined the chat.');
 
     //displays when a user has disconnected and relays to connected clients
     socket.on('disconnect', () => {
-        console.log('user disconnected');
-        io.of('/my-namespace').emit('user disconnected', 'A user has left the chat.');
+        console.log('User ' + slimmedID + ' disconnected.');
+        io.of('/my-namespace').emit('user disconnected', 'User ' + slimmedID + ' has left the chat.');
     });
 
     //displays chat messages serverside and relays to connected clients
     socket.on('chat message', (msg) => {
-        io.of('/my-namespace').emit('chat message', msg);
-        console.log('message: ' + msg);
+        io.of('/my-namespace').emit('chat message', slimmedID + ": " + msg);
+        console.log(slimmedID + ": " + msg);
     });
 
 
