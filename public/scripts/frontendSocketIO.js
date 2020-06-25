@@ -1,7 +1,5 @@
 $(function () {
 
-
-
     var socket = io('localhost:3000/my-namespace');
     $('#usernameForm').submit(function(e){
       e.preventDefault();
