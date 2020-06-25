@@ -1,7 +1,10 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var mysql = require("mysql");
+
+app.use(express.static('public'));
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
@@ -22,6 +25,7 @@ connection.connect(function(err){
     console.log("connected as id " + connection.threadId + "\n");
 });
 
+var username;
 
 //code executes when a connection is received from client
 //custom namespace
@@ -38,28 +42,54 @@ nsp.on('connection', function(socket){
 
     //displays when a user has disconnected and relays to connected clients
     socket.on('disconnect', () => {
-        console.log('User ' + slimmedID + ' disconnected.');
-        io.of('/my-namespace').emit('user disconnected', 'User ' + slimmedID + ' has left the chat.');
+        readUsername(slimmedID, leaveMessage);
+        function leaveMessage(){
+            io.of('/my-namespace').emit('user disconnected', username + ' has left the chat.');
+            console.log('User ' + username + '(' + slimmedID + ')' + ' disconnected.');
+        }
     });
 
     //stores username to database
     socket.on('set username', (msg) => {
         console.log('User ' + slimmedID + ' has set their username to: ' + msg);
         storeUsername(slimmedID, msg);
+
+        socket.join('some room');
+        io.of('/my-namespace').to('some room').emit('some event', 'if you get this message you are in the room');
     });
 
     //displays chat messages serverside and relays to connected clients
     socket.on('chat message', (msg) => {
-        io.of('/my-namespace').emit('chat message', slimmedID + ": " + msg);
-        console.log(slimmedID + ": " + msg);
+        readUsername(slimmedID, emitMessage);
+        function emitMessage(){
+            io.of('/my-namespace').emit('chat message', username + ": " + msg);
+            console.log(username + '(' + slimmedID + ')' + ": " + msg); 
+        }
     });
 
 
     //practice with rooms
-        socket.join('some room');
-        io.of('/my-namespace').to('some room').emit('some event', 'if you get this message you are in the room');
+        
 
 });    
+
+
+    function readUsername(slimmedID, callback){
+    var query = connection.query(
+        "SELECT username FROM usernames WHERE ?",
+        {
+            socketID: slimmedID
+        },
+        function(err, res){
+            if (err) throw err;
+            username = JSON.parse(JSON.stringify(res[0].username));
+            console.log(query.sql);
+            callback();
+        }
+    );
+
+}
+
 
 
 function storeUsername(slimmedID, msg){
