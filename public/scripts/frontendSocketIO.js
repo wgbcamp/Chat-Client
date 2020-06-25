@@ -1,6 +1,6 @@
 $(function () {
 
-    var socket = io('/my-namespace');
+    var socket = io('localhost:3000/my-namespace');
 
     $('#usernameCreateForm').submit(function(e){
         e.preventDefault();
