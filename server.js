@@ -62,7 +62,7 @@ nsp.on('connection', function(socket){
 
         function usernameValidation(){
 
-            if(msg.length > 0 && msg.length < 45 && usernameCount == 0){
+            if(msg.length > 0 && msg.length < 30 && usernameCount == 0){
             
                 storeUsername(slimmedID, msg);
     
@@ -77,6 +77,8 @@ nsp.on('connection', function(socket){
                     function joinMessage(){
                         io.of('/my-namespace').emit('chat message', username + " has joined the chat room.");
                 }
+            }else{
+                io.of('/my-namespace').emit('validation failure');
             }
         } 
     });
