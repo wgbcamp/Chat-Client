@@ -1,8 +1,8 @@
-DROP DATABASE IF EXISTS user_nameDB;
+DROP DATABASE IF EXISTS x4gkipl2yvmskf7y;
 
-CREATE DATABASE user_nameDB;
+CREATE DATABASE x4gkipl2yvmskf7y;
 
-USE user_nameDB;
+USE x4gkipl2yvmskf7y;
 
 CREATE TABLE usernames (
     id INT NOT NULL AUTO_INCREMENT,
