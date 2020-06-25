@@ -1,11 +1,16 @@
 $(function () {
 
     var socket = io('localhost:3000/my-namespace');
-    $('#usernameForm').submit(function(e){
-      e.preventDefault();
-      socket.emit('set username', $('#usernameInput').val());
-      $('#usernameInput').val('');
-      return false;
+
+    $('#usernameCreateForm').submit(function(e){
+        e.preventDefault();
+        socket.emit('set username', $('#usernameCreate').val());
+        $('#usernameCreate').val('');
+        return false;
+    });
+
+    socket.on('close modal', function(){
+        modal.style.display = "none";
     });
 
     $('#messageForm').submit(function(e){
@@ -14,6 +19,7 @@ $(function () {
         $('#messageInput').val('');
         return false;
     });
+
     socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));
     });
@@ -27,3 +33,23 @@ $(function () {
         $('#messages').append($('<li>').text(msg));
     })
 });
+
+// Get the modal
+var modal = document.getElementById("myModal");
+
+// modal opens on page load
+$(document).ready(function() {
+  modal.style.display = "block";
+});
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}

@@ -25,7 +25,8 @@ connection.connect(function(err){
     console.log("connected as id " + connection.threadId + "\n");
 });
 
-var username;
+var username = "";
+var usernameCount = 0;
 
 //code executes when a connection is received from client
 //custom namespace
@@ -36,41 +37,68 @@ nsp.on('connection', function(socket){
         const sessionID = socket.id;
         const slimmedID = sessionID.slice(sessionID.indexOf("#") + 1, sessionID.length);
 
-    //displays when a user has connected and relays to connected clients
+    //logs to server that a socket has connected
     console.log('User ' + slimmedID + ' connected.');
-    io.of('/my-namespace').emit('user connected', 'User ' + slimmedID + ' has joined the chat.');
 
-    //displays when a user has disconnected and relays to connected clients
+    //displays when a user has disconnected and relays to connected clients in chat room
     socket.on('disconnect', () => {
+        if(username == ""){
+            
+        }else{
+
         readUsername(slimmedID, leaveMessage);
         function leaveMessage(){
             io.of('/my-namespace').emit('user disconnected', username + ' has left the chat.');
             console.log('User ' + username + '(' + slimmedID + ')' + ' disconnected.');
+            }
         }
     });
 
-    //stores username to database
+    //stores username to database, adds user to the chat room, relays join message to all users in chat room
     socket.on('set username', (msg) => {
-        console.log('User ' + slimmedID + ' has set their username to: ' + msg);
-        storeUsername(slimmedID, msg);
+        console.log('User ' + slimmedID + ' requested to set their username to: ' + msg);
+        
+        checkForExistingUsername(msg, usernameValidation);
 
-        socket.join('some room');
-        io.of('/my-namespace').to('some room').emit('some event', 'if you get this message you are in the room');
+        function usernameValidation(){
+
+            if(msg.length > 0 && msg.length < 45 && usernameCount == 0){
+            
+                storeUsername(slimmedID, msg);
+    
+                console.log('User ' + slimmedID + ' has set their username to: ' + msg);
+
+                io.of('/my-namespace').emit('close modal');
+
+                socket.join('some room');
+                    io.of('/my-namespace').to('some room').emit('some event', 'if you get this message you are in the room');
+    
+                readUsername(slimmedID, joinMessage);
+                    function joinMessage(){
+                        io.of('/my-namespace').emit('chat message', username + " has joined the chat room.");
+                }
+            }
+        } 
     });
 
     //displays chat messages serverside and relays to connected clients
     socket.on('chat message', (msg) => {
+        if(username == ""){
+
+        }else{
+
         readUsername(slimmedID, emitMessage);
         function emitMessage(){
             io.of('/my-namespace').emit('chat message', username + ": " + msg);
             console.log(username + '(' + slimmedID + ')' + ": " + msg); 
+            }
         }
     });
 
 });    
 
 
-    function readUsername(slimmedID, callback){
+function readUsername(slimmedID, callback){
     var query = connection.query(
         "SELECT username FROM usernames WHERE ?",
         {
@@ -78,7 +106,11 @@ nsp.on('connection', function(socket){
         },
         function(err, res){
             if (err) throw err;
-            username = JSON.parse(JSON.stringify(res[0].username));
+            try {
+                username = JSON.parse(JSON.stringify(res[0].username));
+            }
+            catch (err){
+            }
             console.log(query.sql);
             callback();
         }
@@ -86,7 +118,20 @@ nsp.on('connection', function(socket){
 
 }
 
-
+function checkForExistingUsername(msg, callback){
+    var query = connection.query(
+        "SELECT COUNT (username) FROM usernames WHERE ?",
+        {
+            username: msg
+        },
+        function (err, res){
+            if (err) throw err;
+            console.log(query.sql);
+            usernameCount = JSON.parse(JSON.stringify(res[0]['COUNT (username)']));
+            callback();
+        }
+    );
+}
 
 function storeUsername(slimmedID, msg){
     var query = connection.query(
