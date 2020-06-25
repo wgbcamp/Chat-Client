@@ -4,6 +4,8 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var mysql = require("mysql");
 
+var PORT = process.env.PORT || 3000;
+
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
@@ -11,7 +13,16 @@ app.get('/', (req, res) => {
   });
 
 
-//create mysql connection
+//local mysql connection
+// var connection = mysql.createConnection({
+//     host: "localhost",
+//     port: 3306,
+//     user: "root",
+//     password: "password",
+//     database: "user_nameDB" 
+// });
+
+//remote mysql connection
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -150,6 +161,6 @@ function storeUsername(slimmedID, msg){
 }
 
 
-http.listen(3000, () => {
-    console.log('listening on *:3000');
+http.listen(PORT, () => {
+    console.log(`listening on port: ${PORT}`);
 });
