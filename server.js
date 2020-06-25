@@ -24,11 +24,11 @@ app.get('/', (req, res) => {
 
 //remote mysql connection
 var connection = mysql.createConnection({
-    host: "localhost",
+    host: "d9c88q3e09w6fdb2.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
     port: 3306,
-    user: "root",
-    password: "password",
-    database: "user_nameDB" 
+    user: "f5allx1wl66kz5wx",
+    password: "o0nvjrwr7lkane8l",
+    database: "x4gkipl2yvmskf7y" 
 });
 
 connection.connect(function(err){
