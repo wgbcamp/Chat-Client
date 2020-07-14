@@ -1,4 +1,4 @@
-runtime: nodejs12
+runtime: nodejs
 env: flex
 
 # This sample incurs costs to run on the App Engine flexible environment.
@@ -7,6 +7,8 @@ env: flex
 # https://cloud.google.com/appengine/docs/flexible/nodejs/configuring-your-app-with-app-yaml
 manual_scaling:
   instances: 1
+network:
+  session_affinity: true
 resources:
   cpu: 1
   memory_gb: 1
