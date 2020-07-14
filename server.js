@@ -34,11 +34,6 @@ if (process.env.NODE_ENV === "production"){
     });
 }
 
-//local mysql connection
-
-
-//remote mysql connection
-
 
 connection.connect(function(err){
     if (err) throw err;
