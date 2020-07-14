@@ -17,11 +17,11 @@ var connection = ""
 if (process.env.NODE_ENV === "production"){
 
     connection = mysql.createConnection({
-        host: "d9c88q3e09w6fdb2.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
+        host: "34.86.52.45",
         port: 3306,
-        user: "a3p5lehelh1tzgqi",
-        password: "k3iifbhi8imiay3p",
-        database: "refbltxclseb4ls1" 
+        user: "root",
+        password: "teMp7DhxIIasttrD",
+        database: "usernameDB" 
     });
 
 }else{
