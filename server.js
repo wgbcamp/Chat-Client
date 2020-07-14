@@ -12,24 +12,33 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
 
+var connection = ""
+
+if (process.env.NODE_ENV === "production"){
+
+    connection = mysql.createConnection({
+        host: "d9c88q3e09w6fdb2.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
+        port: 3306,
+        user: "a3p5lehelh1tzgqi",
+        password: "k3iifbhi8imiay3p",
+        database: "refbltxclseb4ls1" 
+    });
+
+}else{
+    connection = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "password",
+        database: "user_nameDB" 
+    });
+}
 
 //local mysql connection
-// var connection = mysql.createConnection({
-//     host: "localhost",
-//     port: 3306,
-//     user: "root",
-//     password: "password",
-//     database: "user_nameDB" 
-// });
+
 
 //remote mysql connection
-var connection = mysql.createConnection({
-    host: "d9c88q3e09w6fdb2.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
-    port: 3306,
-    user: "a3p5lehelh1tzgqi",
-    password: "k3iifbhi8imiay3p",
-    database: "refbltxclseb4ls1" 
-});
+
 
 connection.connect(function(err){
     if (err) throw err;
