@@ -8,8 +8,8 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": "12.6.1",
-    "npm": "6.13.4"
+    "node": "12.6.x",
+    "npm": "6.13.x"
   },
   "author": "",
   "license": "ISC",
