@@ -12,9 +12,9 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
 
-// var connection = ""
+var connection = ""
 
-// if (process.env.NODE_ENV === "production"){
+if (process.env.NODE_ENV === "production"){
 
 var connection = mysql.createConnection({
 
@@ -24,15 +24,15 @@ var connection = mysql.createConnection({
     socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database"
 });
 
-// }else{
-//     connection = mysql.createConnection({
-//         host: "localhost",
-//         port: 3306,
-//         user: "root",
-//         password: "password",
-//         database: "user_nameDB" 
-//     });
-// }
+}else{
+    connection = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "password",
+        database: "user_nameDB" 
+    });
+}
 
 
 connection.connect(function(err){
