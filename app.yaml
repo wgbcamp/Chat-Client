@@ -9,3 +9,12 @@ manual_scaling:
   
 network:
   session_affinity: true
+
+env_variables:
+  SQL_USER: root
+  SQL_PASSWORD: teMp7DhxIIasttrD
+  SQL_DATABASE: usernameDB
+  INSTANCE_CONNECTION_NAME: chatapp-283317:us-east4:chat-database
+
+beta_settings:
+  cloud_sql_instances: chatapp-283317:us-east4:chat-database

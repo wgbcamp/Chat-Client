@@ -17,10 +17,11 @@ app.get('/', (req, res) => {
 // if (process.env.NODE_ENV === "production"){
 
 var connection = mysql.createConnection({
-    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database",
+    
     user: "root",
     password: "teMp7DhxIIasttrD",
-    database: "usernameDB" 
+    database: "usernameDB",
+    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database"
 });
 
 // }else{
