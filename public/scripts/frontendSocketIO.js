@@ -1,5 +1,22 @@
 $(function () {
 
+    var autoScroll;
+    var chatScroll = document.getElementById("decorateMessages");
+
+    function checkScrollHeight(){
+        if(chatScroll.scrollTop >= (chatScroll.scrollHeight - chatScroll.offsetHeight)) {
+            autoScroll = 'true';
+       }else{
+            autoScroll = 'false';
+       }
+    }
+    
+    function useAutoScroll(){
+        if(autoScroll == 'true'){
+            chatScroll.scrollTop = chatScroll.scrollHeight;
+        }
+    }
+
     var socket = io();
 
     $('#usernameCreateForm').submit(function(e){
@@ -25,17 +42,22 @@ $(function () {
     });
 
     socket.on('chat message', function(msg){
+        checkScrollHeight();
         $('#messages').append($('<li>').text(msg));
+        useAutoScroll();
     });
+
     socket.on('user connected', function(msg){
+        checkScrollHeight();
         $('#messages').append($('<li>').text(msg));
-    })
+        useAutoScroll();
+    });
+
     socket.on('user disconnected', function(msg){
+        checkScrollHeight();
         $('#messages').append($('<li>').text(msg));
-    })
-    socket.on('some event', function(msg){
-        $('#messages').append($('<li>').text(msg));
-    })
+        useAutoScroll();
+    });
 });
 
 // Get the modal
@@ -45,3 +67,4 @@ var modal = document.getElementById("myModal");
 $(document).ready(function() {
   modal.style.display = "block";
 });
+

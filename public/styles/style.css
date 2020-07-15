@@ -53,11 +53,18 @@ body{
       border-radius: 7px;
       background: #353535;
       display: table;
+      word-break: normal;
+      
       
 }
 
 #decorateMessages{
       background-color: #272727;
+      height:96vh;
+      max-height: 96vh;
+      max-width: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
       
 }
 
@@ -66,7 +73,7 @@ body{
       overflow-x: hidden;
 }
 
-.row, .contain{
+.row{
       height: 100%;
       width: 100%;
 }
