@@ -18,10 +18,10 @@ app.get('/', (req, res) => {
 
 var connection = mysql.createConnection({
     
-    user: "root",
-    password: "teMp7DhxIIasttrD",
-    database: "usernameDB",
-    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database"
+    user: process.env.SQL_USER,
+    password: process.env.SQL_PASSWORD,
+    database: process.env.SQL_DATABASE,
+    socketPath: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`
 });
 
 // }else{
