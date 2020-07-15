@@ -18,10 +18,10 @@ if (process.env.NODE_ENV === "production"){
 
 var connection = mysql.createConnection({
 
-    user: "process.env.DB_USER",
-    password: "process.env.DB_PASS",
-    database: "process.env.DB_NAME",
-    socketPath: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`
+    user: "root",
+    password: "teMp7DhxIIasttrD",
+    database: "usernameDB",
+    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database"
 });
 
 }else{
