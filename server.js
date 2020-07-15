@@ -12,26 +12,26 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
 
-var connection = ""
+// var connection = ""
 
-if (process.env.NODE_ENV === "production"){
+// if (process.env.NODE_ENV === "production"){
 
-    connection = mysql.createConnection({
-        socketPath: "35.245.38.32/chatapp-283317:us-east4:chat-database",
-        user: "root",
-        password: "teMp7DhxIIasttrD",
-        database: "usernameDB" 
-    });
+var connection = mysql.createConnection({
+    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database",
+    user: "root",
+    password: "teMp7DhxIIasttrD",
+    database: "usernameDB" 
+});
 
-}else{
-    connection = mysql.createConnection({
-        host: "localhost",
-        port: 3306,
-        user: "root",
-        password: "password",
-        database: "user_nameDB" 
-    });
-}
+// }else{
+//     connection = mysql.createConnection({
+//         host: "localhost",
+//         port: 3306,
+//         user: "root",
+//         password: "password",
+//         database: "user_nameDB" 
+//     });
+// }
 
 
 connection.connect(function(err){
