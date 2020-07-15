@@ -12,36 +12,36 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
 
-// var connection = ""
+var connection = ""
 
-// if (process.env.NODE_ENV === "production"){
+if (process.env.NODE_ENV === "production"){
 
-//     connection = mysql.createConnection({
-//         host: "34.86.52.45",
-//         port: 3306,
-//         user: "root",
-//         password: "teMp7DhxIIasttrD",
-//         database: "usernameDB" 
-//     });
+    connection = mysql.createConnection({
+        host: "34.86.52.45",
+        port: 3306,
+        user: "root",
+        password: "teMp7DhxIIasttrD",
+        database: "usernameDB" 
+    });
 
-// }else{
-//     connection = mysql.createConnection({
-//         host: "localhost",
-//         port: 3306,
-//         user: "root",
-//         password: "password",
-//         database: "user_nameDB" 
-//     });
-// }
+}else{
+    connection = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "password",
+        database: "user_nameDB" 
+    });
+}
 
 
-// connection.connect(function(err){
-//     if (err) throw err;
-//     console.log("connected as id " + connection.threadId + "\n");
-// });
+connection.connect(function(err){
+    if (err) throw err;
+    console.log("connected as id " + connection.threadId + "\n");
+});
 
-// var username = "";
-// var usernameCount = 0;
+var username = "";
+var usernameCount = 0;
 
 //code executes when a connection is received from client
 //custom namespace
