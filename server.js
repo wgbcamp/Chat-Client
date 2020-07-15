@@ -43,9 +43,6 @@ connection.connect(function(err){
 var username = "";
 var usernameCount = 0;
 
-//code executes when a connection is received from client
-//custom namespace
-// const nsp = io.of('/my-namespace');
 
 io.on('connection', function(socket){
 
