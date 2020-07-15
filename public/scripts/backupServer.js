@@ -6,48 +6,47 @@ var mysql = require("mysql");
 
 var PORT = process.env.PORT || 3000;
 
-// app.use(express.static('public'));
+app.use(express.static('public'));
 
-// app.get('/', (req, res) => {
-//     res.sendFile(__dirname + '/index.html');
-//   });
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+  });
 
-// var connection = ""
+var connection = ""
 
-// if (process.env.NODE_ENV === "production"){
+if (process.env.NODE_ENV === "production"){
 
-//     connection = mysql.createConnection({
-//         host: "34.86.52.45",
-//         port: 3306,
-//         user: "root",
-//         password: "teMp7DhxIIasttrD",
-//         database: "usernameDB" 
-//     });
+    connection = mysql.createConnection({
+        host: "34.86.52.45",
+        port: 3306,
+        user: "root",
+        password: "teMp7DhxIIasttrD",
+        database: "usernameDB" 
+    });
 
-// }else{
-//     connection = mysql.createConnection({
-//         host: "localhost",
-//         port: 3306,
-//         user: "root",
-//         password: "password",
-//         database: "user_nameDB" 
-//     });
-// }
+}else{
+    connection = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "password",
+        database: "user_nameDB" 
+    });
+}
 
 
-// connection.connect(function(err){
-//     if (err) throw err;
-//     console.log("connected as id " + connection.threadId + "\n");
-// });
+connection.connect(function(err){
+    if (err) throw err;
+    console.log("connected as id " + connection.threadId + "\n");
+});
 
-// var username = "";
-// var usernameCount = 0;
+var username = "";
+var usernameCount = 0;
 
 //code executes when a connection is received from client
 //custom namespace
-// const nsp = io.of('/my-namespace');
-
-io.on('connection', function(socket){
+const nsp = io.of('/my-namespace');
+nsp.on('connection', function(socket){
 
     //holds value of last socket that performed an action
         const sessionID = socket.id;
@@ -64,7 +63,7 @@ io.on('connection', function(socket){
 
         readUsername(slimmedID, leaveMessage);
         function leaveMessage(){
-            io.emit('user disconnected', username + ' has left the chat.');
+            io.of('/my-namespace').emit('user disconnected', username + ' has left the chat.');
             console.log('User ' + username + '(' + slimmedID + ')' + ' disconnected.');
             }
         }
@@ -84,15 +83,17 @@ io.on('connection', function(socket){
     
                 console.log('User ' + slimmedID + ' has set their username to: ' + msg);
 
-                io.emit('close modal');
+                io.of('/my-namespace').emit('close modal');
 
+                socket.join('some room');
+                    io.of('/my-namespace').to('some room').emit('some event', 'if you get this message you are in the room');
     
                 readUsername(slimmedID, joinMessage);
                     function joinMessage(){
-                        io.emit('chat message', username + " has joined the chat room.");
+                        io.of('/my-namespace').emit('chat message', username + " has joined the chat room.");
                 }
             }else{
-                io.emit('validation failure');
+                io.of('/my-namespace').emit('validation failure');
             }
         } 
     });
@@ -105,7 +106,7 @@ io.on('connection', function(socket){
 
         readUsername(slimmedID, emitMessage);
         function emitMessage(){
-            io.emit('chat message', username + ": " + msg);
+            io.of('/my-namespace').emit('chat message', username + ": " + msg);
             console.log(username + '(' + slimmedID + ')' + ": " + msg); 
             }
         }
