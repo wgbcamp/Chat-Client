@@ -3,6 +3,7 @@ var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var mysql = require("mysql");
+const { connected } = require('process');
 
 var PORT = process.env.PORT || 3000;
 
@@ -21,7 +22,8 @@ var connection = mysql.createConnection({
     user: "root",
     password: "teMp7DhxIIasttrD",
     database: "usernameDB",
-    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database"
+    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database",
+    multipleStatements: true
 });
 
 }else{
@@ -30,7 +32,8 @@ var connection = mysql.createConnection({
         port: 3306,
         user: "root",
         password: "password",
-        database: "user_nameDB" 
+        database: "usernameDB",
+        multipleStatements: true
     });
 }
 
@@ -38,22 +41,30 @@ var connection = mysql.createConnection({
 connection.connect(function(err){
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
+    var usernameTable = "DROP TABLE IF EXISTS usernames;CREATE TABLE usernames (id INT NOT NULL AUTO_INCREMENT, socketID VARCHAR(50) NOT NULL, username VARCHAR(50) NOT NULL, PRIMARY KEY(id))";
+    connection.query(usernameTable, function (err, res){
+        if (err) throw err;
+        console.log("Username table created");
+    });
 });
 
 var username = "";
 var usernameCount = 0;
-
+var connectedUsers;
+var clientCount = 0;
 
 io.on('connection', function(socket){
 
-    //holds value of last socket that performed an action
+    // HOLDS VALUE OF LAST SOCKET THAT PERFORMED AN ACTION
         const sessionID = socket.id;
         const slimmedID = sessionID.slice(sessionID.indexOf("#") + 1, sessionID.length);
 
-    //logs to server that a socket has connected
+    //LOGS TO SERVER THAT A SOCKET HAS CONNECTED
     console.log('User ' + slimmedID + ' connected.');
+    clientCount++;
+    io.emit('anonymous users', "Anonymous users: " + clientCount);
 
-    //displays when a user has disconnected and relays to connected clients in chat room
+    //DISPLAYS WHEN A USER HAS DISCONNECTED AND RELAYS TO CONNECTED CLIENTS IN CHAT ROOM
     socket.on('disconnect', () => {
 
         readUsername(slimmedID, leaveMessage);
@@ -61,10 +72,16 @@ io.on('connection', function(socket){
             io.emit('user disconnected', username + ' has left the chat.');
             console.log('User ' + username + '(' + slimmedID + ')' + ' disconnected.');
             }
-
+        deleteUsername(slimmedID);
+        findAllUsers(displayUsers);
+        function displayUsers(connectedUsers){
+            io.emit('current users', connectedUsers)      
+        }
+        clientCount--;
+        io.emit('anonymous users', "Anonymous users: " + clientCount);
     });
 
-    //stores username to database, adds user to the chat room, relays join message to all users in chat room
+    //STORES USERNAME TO DATABASE, RELAYS NAME CHANGE TO ALL USERS IN CHAT ROOM
     socket.on('set username', (msg) => {
         console.log('User ' + slimmedID + ' requested to set their username to: ' + msg);
         
@@ -83,15 +100,21 @@ io.on('connection', function(socket){
     
                 readUsername(slimmedID, joinMessage);
                     function joinMessage(){
-                        io.emit('chat message', username + " has joined the chat room.");
+                        io.emit('chat message', "Anonymous user has set their nickname to " + "'" + username +"'.");
+                        findAllUsers(displayUsers);
+                        function displayUsers(connectedUsers){
+                            io.emit('current users', connectedUsers)
+                            
+                        }
                 }
             }else{
                 io.emit('validation failure');
             }
         } 
+
     });
 
-    //displays chat messages serverside and relays to connected clients
+    //DISPLAYS CHAT MESSAGES SERVERSIDE AND RELAYS TO CONNECTED CLIENTS
     socket.on('chat message', (msg) => {
         if(username == ""){
 
@@ -155,6 +178,36 @@ function storeUsername(slimmedID, msg){
     );
     console.log(query.sql);
 }
+
+function deleteUsername(slimmedID){
+    var query = connection.query(
+        "DELETE FROM usernames WHERE ?",
+        {
+            socketID: slimmedID
+        },
+        function(err, res){
+            if(err) throw err;
+            console.log(query.sql);
+        }
+    );
+}
+
+function findAllUsers(callback){
+    var query = connection.query(
+        "SELECT username FROM usernames",
+        function(err, res){
+            console.log(query.sql);
+            connectedUsers = JSON.parse(JSON.stringify(res));
+            console.log(connectedUsers);
+            callback(connectedUsers);
+        }
+        
+    );
+}
+
+
+
+
 
 
 http.listen(PORT, () => {

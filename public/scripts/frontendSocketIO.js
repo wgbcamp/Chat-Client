@@ -53,6 +53,17 @@ $(function () {
         useAutoScroll();
     });
 
+    socket.on('current users', function(msg){
+        $("#currentUserList").empty();
+        for(i=0; i<msg.length; i++){  
+            $('#currentUserList').append('<li>' + msg[i].username)      
+        }
+    })
+
+    socket.on('anonymous users', function(msg){
+        $("#anonymousUserList").text(msg);
+    })
+
     socket.on('user disconnected', function(msg){
         checkScrollHeight();
         $('#messages').append($('<li>').text(msg));
