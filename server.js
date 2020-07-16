@@ -55,16 +55,13 @@ io.on('connection', function(socket){
 
     //displays when a user has disconnected and relays to connected clients in chat room
     socket.on('disconnect', () => {
-        if(username == ""){
-            
-        }else{
 
         readUsername(slimmedID, leaveMessage);
         function leaveMessage(){
             io.emit('user disconnected', username + ' has left the chat.');
             console.log('User ' + username + '(' + slimmedID + ')' + ' disconnected.');
             }
-        }
+
     });
 
     //stores username to database, adds user to the chat room, relays join message to all users in chat room
@@ -118,13 +115,12 @@ function readUsername(slimmedID, callback){
             socketID: slimmedID
         },
         function(err, res){
-            if (err) throw err;
-            try {
+            if ( JSON.parse(JSON.stringify(res)) == ""){
+                username = `Anonymous user (${slimmedID})`;
+            }else{
                 username = JSON.parse(JSON.stringify(res[0].username));
+                console.log(query.sql);
             }
-            catch (err){
-            }
-            console.log(query.sql);
             callback();
         }
     );
