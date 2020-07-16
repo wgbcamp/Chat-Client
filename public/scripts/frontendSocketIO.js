@@ -61,7 +61,8 @@ $(function () {
     })
 
     socket.on('anonymous users', function(msg){
-        $("#anonymousUserList").text(msg);
+        console.log(document.getElementById("currentUserList").getElementsByTagName("li").length);
+        $("#anonymousUserList").text("Anonymous users: " + (msg-document.getElementById("currentUserList").getElementsByTagName("li").length));
     })
 
     socket.on('user disconnected', function(msg){

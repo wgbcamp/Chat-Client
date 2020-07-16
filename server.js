@@ -62,7 +62,7 @@ io.on('connection', function(socket){
     //LOGS TO SERVER THAT A SOCKET HAS CONNECTED
     console.log('User ' + slimmedID + ' connected.');
     clientCount++;
-    io.emit('anonymous users', "Anonymous users: " + clientCount);
+    io.emit('anonymous users', clientCount);
 
     //DISPLAYS WHEN A USER HAS DISCONNECTED AND RELAYS TO CONNECTED CLIENTS IN CHAT ROOM
     socket.on('disconnect', () => {
@@ -78,7 +78,7 @@ io.on('connection', function(socket){
             io.emit('current users', connectedUsers)      
         }
         clientCount--;
-        io.emit('anonymous users', "Anonymous users: " + clientCount);
+        io.emit('anonymous users', clientCount);
     });
 
     //STORES USERNAME TO DATABASE, RELAYS NAME CHANGE TO ALL USERS IN CHAT ROOM
