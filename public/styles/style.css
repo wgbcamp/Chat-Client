@@ -73,7 +73,7 @@ body{
       overflow-x: hidden;
 }
 
-#currentUsers{
+#userListContainer{
       color: white;
       background-color: #383838;
       width: 100%;
@@ -111,5 +111,5 @@ body{
       margin: auto;
       padding: 20px;
       border: 1px solid #888;
-      width: 80%;
+      width: 50%;
     }

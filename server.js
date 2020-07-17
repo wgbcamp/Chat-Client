@@ -3,7 +3,6 @@ var app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var mysql = require("mysql");
-const { connected } = require('process');
 
 var PORT = process.env.PORT || 3000;
 
@@ -41,17 +40,18 @@ var connection = mysql.createConnection({
 connection.connect(function(err){
     if (err) throw err;
     console.log("connected as id " + connection.threadId + "\n");
-    var usernameTable = "DROP TABLE IF EXISTS usernames;CREATE TABLE usernames (id INT NOT NULL AUTO_INCREMENT, socketID VARCHAR(50) NOT NULL, username VARCHAR(50) NOT NULL, PRIMARY KEY(id))";
+    var usernameTable = "DROP TABLE IF EXISTS usernames,anonymousUsers;CREATE TABLE usernames (id INT NOT NULL AUTO_INCREMENT, socketID VARCHAR(50) NOT NULL, username VARCHAR(50) NOT NULL, PRIMARY KEY(id));CREATE TABLE anonymousUsers (id INT NOT NULL AUTO_INCREMENT, socketID VARCHAR(50) NOT NULL, PRIMARY KEY(id))";
     connection.query(usernameTable, function (err, res){
         if (err) throw err;
-        console.log("Username table created");
+        console.log("Username and anonymous tables created");
     });
 });
 
 var username = "";
 var usernameCount = 0;
 var connectedUsers;
-var clientCount = 0;
+var userCount;
+var anonCount;
 
 io.on('connection', function(socket){
 
@@ -59,67 +59,57 @@ io.on('connection', function(socket){
         const sessionID = socket.id;
         const slimmedID = sessionID.slice(sessionID.indexOf("#") + 1, sessionID.length);
 
+        storeAnonymous(slimmedID);
+        sendAnonCountToClient();
+
     //LOGS TO SERVER THAT A SOCKET HAS CONNECTED
     console.log('User ' + slimmedID + ' connected.');
-    clientCount++;
-    io.emit('anonymous users', clientCount);
 
     //DISPLAYS WHEN A USER HAS DISCONNECTED AND RELAYS TO CONNECTED CLIENTS IN CHAT ROOM
     socket.on('disconnect', () => {
-
         readUsername(slimmedID, leaveMessage);
         function leaveMessage(){
             io.emit('user disconnected', username + ' has left the chat.');
             console.log('User ' + username + '(' + slimmedID + ')' + ' disconnected.');
             }
         deleteUsername(slimmedID);
+        deleteAnonymous(slimmedID);
         findAllUsers(displayUsers);
         function displayUsers(connectedUsers){
             io.emit('current users', connectedUsers)      
         }
-        clientCount--;
-        io.emit('anonymous users', clientCount);
+        sendAnonCountToClient();
     });
 
     //STORES USERNAME TO DATABASE, RELAYS NAME CHANGE TO ALL USERS IN CHAT ROOM
     socket.on('set username', (msg) => {
         console.log('User ' + slimmedID + ' requested to set their username to: ' + msg);
-        
         checkForExistingUsername(msg, usernameValidation);
-
         function usernameValidation(){
-
             if(msg.length > 0 && msg.length < 30 && usernameCount == 0){
-            
                 storeUsername(slimmedID, msg);
-    
                 console.log('User ' + slimmedID + ' has set their username to: ' + msg);
-
                 io.emit('close modal');
 
-    
                 readUsername(slimmedID, joinMessage);
                     function joinMessage(){
                         io.emit('chat message', "Anonymous user has set their nickname to " + "'" + username +"'.");
                         findAllUsers(displayUsers);
                         function displayUsers(connectedUsers){
-                            io.emit('current users', connectedUsers)
-                            
+                            io.emit('current users', connectedUsers)   
                         }
                 }
+                    sendAnonCountToClient();
             }else{
                 io.emit('validation failure');
             }
         } 
-
     });
 
     //DISPLAYS CHAT MESSAGES SERVERSIDE AND RELAYS TO CONNECTED CLIENTS
     socket.on('chat message', (msg) => {
         if(username == ""){
-
         }else{
-
         readUsername(slimmedID, emitMessage);
         function emitMessage(){
             io.emit('chat message', username + ": " + msg);
@@ -127,9 +117,7 @@ io.on('connection', function(socket){
             }
         }
     });
-
 });    
-
 
 function readUsername(slimmedID, callback){
     var query = connection.query(
@@ -139,7 +127,7 @@ function readUsername(slimmedID, callback){
         },
         function(err, res){
             if ( JSON.parse(JSON.stringify(res)) == ""){
-                username = `Anonymous user (${slimmedID})`;
+                username = `Anonymous user `;
             }else{
                 username = JSON.parse(JSON.stringify(res[0].username));
                 console.log(query.sql);
@@ -147,7 +135,18 @@ function readUsername(slimmedID, callback){
             callback();
         }
     );
+}
 
+function findAllUsers(callback){
+    var query = connection.query(
+        "SELECT username FROM usernames",
+        function(err, res){
+            console.log(query.sql);
+            connectedUsers = JSON.parse(JSON.stringify(res));
+            console.log(connectedUsers);
+            callback(connectedUsers);
+        } 
+    );
 }
 
 function checkForExistingUsername(msg, callback){
@@ -165,6 +164,45 @@ function checkForExistingUsername(msg, callback){
     );
 }
 
+function sendAnonCountToClient(){
+    countAnonymous();
+    function countAnonymous(){
+        var query = connection.query(
+            "SELECT COUNT (socketid) FROM anonymousUsers",
+            function(err, res){
+                if(err) throw err;
+                anonCount = JSON.parse(JSON.stringify(res[0]['COUNT (socketid)']));           
+                countUsers();
+
+                function countUsers(){
+                    var query = connection.query(
+                        "SELECT COUNT (socketid) FROM usernames",
+                        function(err, res){
+                            if(err) throw err;
+                            userCount = JSON.parse(JSON.stringify(res[0]['COUNT (socketid)']));
+                            io.emit('registered users', userCount);
+                            io.emit('anonymous users', anonCount-userCount);      
+                        }   
+                    );
+                }
+            }
+        );
+    }
+}
+
+function storeAnonymous(slimmedID){
+    var query = connection.query(
+        "INSERT INTO anonymousUsers SET ?",
+        {
+            socketID: slimmedID
+        },
+        function(err, res){
+            if(err) throw err;
+        }
+    );
+    console.log(query.sql);
+}
+
 function storeUsername(slimmedID, msg){
     var query = connection.query(
         "INSERT INTO usernames SET ?",
@@ -179,6 +217,19 @@ function storeUsername(slimmedID, msg){
     console.log(query.sql);
 }
 
+function deleteAnonymous(slimmedID){
+    var query = connection.query(
+        "DELETE FROM anonymousUsers WHERE ?",
+        {
+            socketID: slimmedID
+        },
+        function(err, res){
+            if(err) throw err;
+            console.log(query.sql);
+        }
+    );
+}
+
 function deleteUsername(slimmedID){
     var query = connection.query(
         "DELETE FROM usernames WHERE ?",
@@ -191,24 +242,6 @@ function deleteUsername(slimmedID){
         }
     );
 }
-
-function findAllUsers(callback){
-    var query = connection.query(
-        "SELECT username FROM usernames",
-        function(err, res){
-            console.log(query.sql);
-            connectedUsers = JSON.parse(JSON.stringify(res));
-            console.log(connectedUsers);
-            callback(connectedUsers);
-        }
-        
-    );
-}
-
-
-
-
-
 
 http.listen(PORT, () => {
     console.log(`listening on port: ${PORT}`);

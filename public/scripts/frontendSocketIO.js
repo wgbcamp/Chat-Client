@@ -1,5 +1,6 @@
 $(function () {
 
+
     var autoScroll;
     var chatScroll = document.getElementById("decorateMessages");
 
@@ -47,12 +48,6 @@ $(function () {
         useAutoScroll();
     });
 
-    socket.on('user connected', function(msg){
-        checkScrollHeight();
-        $('#messages').append($('<li>').text(msg));
-        useAutoScroll();
-    });
-
     socket.on('current users', function(msg){
         $("#currentUserList").empty();
         for(i=0; i<msg.length; i++){  
@@ -60,10 +55,15 @@ $(function () {
         }
     })
 
+    socket.on('registered users', function(msg){
+        $("#currentUsers").text("Users in chat room: " + (msg));
+    })
+
     socket.on('anonymous users', function(msg){
         console.log(document.getElementById("currentUserList").getElementsByTagName("li").length);
-        $("#anonymousUserList").text("Anonymous users: " + (msg-document.getElementById("currentUserList").getElementsByTagName("li").length));
+        $("#anonymousUserList").text("Users in waiting room: " + (msg));
     })
+
 
     socket.on('user disconnected', function(msg){
         checkScrollHeight();
