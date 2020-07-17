@@ -11,3 +11,8 @@ CREATE TABLE usernames (
     PRIMARY KEY (id)
 );
 
+CREATE TABLE anonymousUsers (
+	id INT NOT NULL AUTO_INCREMENT,
+    socketID VARCHAR (50) NOT NULL,
+	PRIMARY KEY (id)
+);
