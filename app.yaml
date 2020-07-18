@@ -1,0 +1,8 @@
+runtime: nodejs
+env: flex
+manual_scaling: 
+  instances: 1 
+network:
+  session_affinity: true
+beta_settings:
+  cloud_sql_instances: chatapp-283317:us-east4:chat-database
