@@ -4,8 +4,6 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var mysql = require("mysql");
 
-const creds = require('./creds');
-
 var PORT = process.env.PORT || 3000;
 
 app.use(express.static('public'));
@@ -20,10 +18,10 @@ if (process.env.NODE_ENV === "production"){
 
 var connection = mysql.createConnection({
 
-    user: creds.username,
-    password: creds.password,
-    database: creds.database,
-    socketPath: creds.socketPath,
+    user: "root",
+    password: "teMp7DhxIIasttrD",
+    database: "usernameDB",
+    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database",
     multipleStatements: true
 });
 
