@@ -37,9 +37,10 @@ npm run start
 ## Technologies 
 
 * Javascript, CSS, HTML
+* Bootstrap
 * Socket.IO
 * jQuery
 * Express.js
 * Node.js
 * NPM
-* mySQL
+* SQL
