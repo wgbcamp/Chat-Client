@@ -5,7 +5,7 @@ Chat client featuring multiple simultaneous connections through web sockets. All
 ## [Demo the application](https://chat-app-w.herokuapp.com/)
 
 
-![Project image](public/images/chatapppicture.pn)
+![Project image](public/images/chatapppicture.png)
 
 ## Getting Started
 The following instructions will allow you to clone the project to your machine for testing.
