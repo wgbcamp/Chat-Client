@@ -22,7 +22,7 @@ var connection = mysql.createConnection({
     user: process.env.SQL_USER,
     password: process.env.SQL_PASSWORD,
     database: process.env.SQL_DATABASE_NAME,
-    socketPath: process.env.INSTANCE_CONNECTION_NAME,
+    socketPath: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
     multipleStatements: true
 });
 
