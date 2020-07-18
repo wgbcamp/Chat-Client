@@ -1,3 +1,4 @@
+require('dotenv').config();
 var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
@@ -18,10 +19,10 @@ if (process.env.NODE_ENV === "production"){
 
 var connection = mysql.createConnection({
 
-    user: "root",
-    password: "teMp7DhxIIasttrD",
-    database: "usernameDB",
-    socketPath: "/cloudsql/chatapp-283317:us-east4:chat-database",
+    user: process.env.SQL_USER,
+    password: process.env.SQL_PASSWORD,
+    database: process.env.SQL_DATABASE_NAME,
+    socketPath: process.env.INSTANCE_CONNECTION_NAME,
     multipleStatements: true
 });
 
